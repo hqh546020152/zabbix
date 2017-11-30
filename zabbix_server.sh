@@ -120,6 +120,15 @@ php-fpm -t &> /dev/null
 [ $? -eq 0 ] && systemctl restart php-fpm
 }
 
+zabbix_server_zhongwen(){
+
+file_data=`ls -l /usr/share/fonts/dejavu/DejaVuSans.ttf|awk '{print $5}'`
+[ $file_data -eq 11785184 ] && echo "已存在中文包" && return 0 
+#dirname=`pwd`
+mv /usr/share/fonts/dejavu/DejaVuSans.ttf /usr/share/fonts/dejavu/DejaVuSans.ttf.bak
+cp simkai.ttf /usr/share/fonts/dejavu/DejaVuSans.ttf
+
+}
 
 
 #安装nginx
@@ -130,3 +139,5 @@ zabbix_mysql
 zabbix_php
 #安装zabbix-server端
 zabbix_server_install
+#加载中文包
+zabbix_server_zhongwen
