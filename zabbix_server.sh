@@ -1,7 +1,9 @@
 #!/bin/bash
 #
 
-DBHost=192.168.12.236
+#数据库连接地址
+DBHost=172.18.53.159
+#数据库密码
 DBPassword=rvSs6WZGGKyW8Ywz8d3v
 
 #安装wget
@@ -45,7 +47,7 @@ php -v &> /dev/null
 [ $? -eq 0 ] && echo "php已安装完毕" && return 0
 yum install php php-mysql php-fpm -y
 #sed -i '38,57s/^/#/' /etc/nginx/nginx.conf     ##把38行到57的注释掉
-#sed -i 's/^;date.timezone =/date.timezone = Asia\/Shanghai/' /etc/php.ini
+sed -i 's/^;date.timezone =/date.timezone = Asia\/Shanghai/' /etc/php.ini
 sed -i 's/^post_max_size =.*/post_max_size = 16M/' /etc/php.ini
 sed -i 's/^max_execution_time =.*/max_execution_time = 300/' /etc/php.ini
 sed -i 's/^max_input_time =.*/max_input_time = 300/' /etc/php.ini
@@ -91,14 +93,27 @@ chown nginx:nginx -R /var/www/zabbix
 chown root:nginx /var/lib/php/session
 #DBName=zabbix
 #DBName=zabbix
-cat "ListenPort=10051" >> /etc/zabbix/zabbix_server.conf
-cat "DBHost=$DBHost" >> /etc/zabbix/zabbix_server.conf
-cat "DBPassword=$DBPassword" >> /etc/zabbix/zabbix_server.conf
-cat "DBSocket=/tmp/mysql.sock" >> /etc/zabbix/zabbix_server.conf
-cat "DBPort=3306" >> /etc/zabbix/zabbix_server.conf
-cat "Timeout=30" >> /etc/zabbix/zabbix_server.conf
+echo "ListenPort=10051" >> /etc/zabbix/zabbix_server.conf
+echo "DBHost=$DBHost" >> /etc/zabbix/zabbix_server.conf
+echo "DBPassword=$DBPassword" >> /etc/zabbix/zabbix_server.conf
+echo "DBSocket=/tmp/mysql.sock" >> /etc/zabbix/zabbix_server.conf
+echo "DBPort=3306" >> /etc/zabbix/zabbix_server.conf
+echo "Timeout=30" >> /etc/zabbix/zabbix_server.conf
 
 systemctl start zabbix-server && systemctl enable zabbix-server
+
+echo "请按以下命令执行，完成zabbix安装" > install.txt
+echo "mysql" >> install.txt
+echo "set password=password('$DBPassword');" >> install.txt
+echo "create database zabbix;" >> install.txt
+echo "grant all privileges on zabbix.* to 'zabbix'@'$DBHost' identified by '$DBPassword';" >> install.txt
+echo "grant all privileges on zabbix.* to 'zabbix'@'localhost' identified by '$DBPassword';" >> install.txt
+echo "flush privilegs;" >> install.txt
+echo "\q" >> install.txt
+echo "zcat $A |mysql -uzabbix -p zabbix" >> install.txt
+echo "数据库密码：$DBPassword" >> install.txt
+echo "访问host" >> install.txt
+echo "初始账号密码：admin/zabbix" >> install.txt
 }
 
 
