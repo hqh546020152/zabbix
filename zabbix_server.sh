@@ -86,7 +86,6 @@ rpm -ivh http://repo.zabbix.com/zabbix/3.2/rhel/7/x86_64/zabbix-release-3.2-1.el
 rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
 yum install -y zabbix-server-mysql zabbix-web-mysql zabbix-get
 A=`ls /usr/share/doc/zabbix-server-mysql*/cre*`
-echo "请将zabbix数据文件导入库中，命令：zcat $A \|mysql -uroot -p zabbixdb"
 chown nginx:nginx -R /etc/zabbix/web/
 cp -r /usr/share/zabbix /var/www
 chown nginx:nginx -R /var/www/zabbix
@@ -108,12 +107,17 @@ echo "set password=password('$DBPassword');" >> install.txt
 echo "create database zabbix;" >> install.txt
 echo "grant all privileges on zabbix.* to 'zabbix'@'$DBHost' identified by '$DBPassword';" >> install.txt
 echo "grant all privileges on zabbix.* to 'zabbix'@'localhost' identified by '$DBPassword';" >> install.txt
-echo "flush privilegs;" >> install.txt
+echo "flush privileges;" >> install.txt
 echo "\q" >> install.txt
 echo "zcat $A |mysql -uzabbix -p zabbix" >> install.txt
 echo "数据库密码：$DBPassword" >> install.txt
 echo "访问host" >> install.txt
 echo "初始账号密码：admin/zabbix" >> install.txt
+
+nginx -t &> /dev/null
+[ $? -eq 0 ] && nginx -s reload
+php-fpm -t &> /dev/null
+[ $? -eq 0 ] && systemctl restart php-fpm
 }
 
 
