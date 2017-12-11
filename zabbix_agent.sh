@@ -10,14 +10,8 @@ zabbix_agentd --version &> /dev/null
 yum install zabbix-agent -y
 
 
-vi /etc/zabbix/zabbix_agentd.conf
-
-Server=127.0.0.1   	  Server=172.18.53.159
-
-ServerActive=127.0.0.1    #ServerActive=127.0.0.1
-
-Hostname=Zabbix server    Hostname=zabbixserver
-
+mv /etc/zabbix/zabbix_agentd.conf /etc/zabbix/zabbix_agentd.conf.initbak
+cat ./conf/zabbix_agentd.conf > /etc/zabbix/zabbix_agentd.conf
 
 systemctl start zabbix-agent			
 systemctl enable zabbix-agent
