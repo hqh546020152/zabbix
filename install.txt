@@ -1,12 +1,12 @@
 请按以下命令执行，完成zabbix安装
 mysql
-set password=password('rvSs6WZGGKyW8Ywz8d3v');
+set password=password('');
 create database zabbix;
-grant all privileges on zabbix.* to 'zabbix'@'172.18.53.159' identified by 'rvSs6WZGGKyW8Ywz8d3v';
-grant all privileges on zabbix.* to 'zabbix'@'localhost' identified by 'rvSs6WZGGKyW8Ywz8d3v';
-flush privilegs;
+grant all privileges on zabbix.* to 'zabbix'@'' identified by '';
+grant all privileges on zabbix.* to 'zabbix'@'localhost' identified by '';
+flush privileges;
 \q
-zcat /usr/share/doc/zabbix-server-mysql-3.2.10/create.sql.gz |mysql -uzabbix -p zabbix
-数据库密码：rvSs6WZGGKyW8Ywz8d3v
+zcat  |mysql -uzabbix -p zabbix
+数据库密码：
 访问host
 初始账号密码：admin/zabbix

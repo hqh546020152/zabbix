@@ -2,9 +2,9 @@
 #
 
 #数据库连接地址
-DBHost=172.18.53.159
+#DBHost=10.40.2.212
 #数据库密码
-DBPassword=rvSs6WZGGKyW8Ywz8d3v
+#DBPassword=rvSs6WZGGKyW8Ywz8d3v
 
 #安装wget
 wget --version &> /dev/null
@@ -21,6 +21,7 @@ else
 	yum clean all
   	yum makecache
   	yum -y update
+	cd -
 fi
 #安装release
 rpm -ivh http://www.rpmfind.net/linux/centos/7.4.1708/extras/x86_64/Packages/epel-release-7-9.noarch.rpm
@@ -90,14 +91,17 @@ zabbix_server_install(){
 	cp -r /usr/share/zabbix /var/www
 	chown nginx:nginx -R /var/www/zabbix
 	chown root:nginx /var/lib/php/session
+
 	#DBName=zabbix
-	#DBName=zabbix
-	echo "ListenPort=10051" >> /etc/zabbix/zabbix_server.conf
-	echo "DBHost=$DBHost" >> /etc/zabbix/zabbix_server.conf
-	echo "DBPassword=$DBPassword" >> /etc/zabbix/zabbix_server.conf
-	echo "DBSocket=/tmp/mysql.sock" >> /etc/zabbix/zabbix_server.conf
-	echo "DBPort=3306" >> /etc/zabbix/zabbix_server.conf
-	echo "Timeout=30" >> /etc/zabbix/zabbix_server.conf
+	#echo "ListenPort=10051" >> /etc/zabbix/zabbix_server.conf
+	#echo "DBHost=$DBHost" >> /etc/zabbix/zabbix_server.conf
+	#echo "DBPassword=$DBPassword" >> /etc/zabbix/zabbix_server.conf
+	#echo "DBSocket=/tmp/mysql.sock" >> /etc/zabbix/zabbix_server.conf
+	#echo "DBPort=3306" >> /etc/zabbix/zabbix_server.conf
+	#echo "Timeout=30" >> /etc/zabbix/zabbix_server.conf
+
+	mv /etc/zabbix/zabbix_server.conf /etc/zabbix/zabbix_server.conf.initbak
+	cat ./conf/zabbix_server.conf > /etc/zabbix/zabbix_server.conf
 
 	systemctl start zabbix-server && systemctl enable zabbix-server
 
@@ -126,18 +130,18 @@ zabbix_server_zhongwen(){
 	[ $file_data -eq 11785184 ] && echo "已存在中文包" && return 0 
 	#dirname=`pwd`
 	mv /usr/share/fonts/dejavu/DejaVuSans.ttf /usr/share/fonts/dejavu/DejaVuSans.ttf.bak
-	cp simkai.ttf /usr/share/fonts/dejavu/DejaVuSans.ttf
+	cp conf/simkai.ttf /usr/share/fonts/dejavu/DejaVuSans.ttf
 
 }
 
 
 #安装nginx
-#zabbix_nginx
+zabbix_nginx
 #安装mysql
 zabbix_mysql
 #安装php
-#zabbix_php
+zabbix_php
 #安装zabbix-server端
-#zabbix_server_install
+zabbix_server_install
 #加载中文包
-#zabbix_server_zhongwen
+zabbix_server_zhongwen
