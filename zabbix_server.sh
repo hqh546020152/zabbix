@@ -11,6 +11,7 @@ wget --version &> /dev/null
 [ $? -ne 0 ] && yum install -y wget && echo "wget已安装完毕"
 
 #更换yum源
+yum_check(){
 if [ -d /etc/yum.repos.d/backup ];then
 	echo "aliyun"	
 else
@@ -23,6 +24,8 @@ else
   	yum -y update
 	cd -
 fi
+}
+
 #安装release
 rpm -ivh http://www.rpmfind.net/linux/centos/7.4.1708/extras/x86_64/Packages/epel-release-7-9.noarch.rpm
 #关闭firewalld
@@ -38,6 +41,7 @@ zabbix_mysql(){
 	wget http://dev.mysql.com/get/mysql-community-release-el7-5.noarch.rpm
 	rpm -ivh mysql-community-release-el7-5.noarch.rpm
 	yum install mysql-community-server mysql -y
+	[ $? -ne 0 ] && return 0
 	systemctl start mysqld && systemctl enable mysqld && echo "请初始化MySQL，并创建zabbix数据库"
 	netstat -lntp| grep 3306 | grep mysqld &> /dev/null
 	[ $? -ne 0 ] && echo "MySQL启动失败,请检查日志"
@@ -47,6 +51,7 @@ zabbix_php(){
 	php -v &> /dev/null
 	[ $? -eq 0 ] && echo "php已安装完毕" && return 0
 	yum install php php-mysql php-fpm -y
+	[ $? -ne 0 ] && return 0
 	#sed -i '38,57s/^/#/' /etc/nginx/nginx.conf     ##把38行到57的注释掉
 	sed -i 's/^;date.timezone =/date.timezone = Asia\/Shanghai/' /etc/php.ini
 	sed -i 's/^post_max_size =.*/post_max_size = 16M/' /etc/php.ini
@@ -65,6 +70,11 @@ zabbix_nginx(){
 	nginx -v &> /dev/null
 	[ $? -eq 0 ] && echo "nginx已安装完毕" && return 0
 	yum install -y nginx
+	#如yum上没nginx包则继续安装包添加，并重新下载安装
+	[ $? -ne 0 ] && rpm -Uvh http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm && yum install -y
+	
+	nginx -v &> /dev/null
+	[ $? -ne 0 ] && echo "nginx安装失败，请检查原因" && return 0
 	systemctl start nginx
 	systemctl enable nginx
 
@@ -86,6 +96,7 @@ zabbix_server_install(){
 	rpm -ivh http://repo.zabbix.com/zabbix/3.2/rhel/7/x86_64/zabbix-release-3.2-1.el7.noarch.rpm
 	rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
 	yum install -y zabbix-server-mysql zabbix-web-mysql zabbix-get
+	[ $? -ne 0 ] && return 0
 	A=`ls /usr/share/doc/zabbix-server-mysql*/cre*`
 	chown nginx:nginx -R /etc/zabbix/web/
 	cp -r /usr/share/zabbix /var/www
@@ -135,6 +146,8 @@ zabbix_server_zhongwen(){
 }
 
 
+#检测yum源
+yum_check
 #安装nginx
 zabbix_nginx
 #安装mysql

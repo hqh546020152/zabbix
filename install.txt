@@ -6,7 +6,7 @@ grant all privileges on zabbix.* to 'zabbix'@'' identified by '';
 grant all privileges on zabbix.* to 'zabbix'@'localhost' identified by '';
 flush privileges;
 \q
-zcat  |mysql -uzabbix -p zabbix
+zcat /usr/share/doc/zabbix-server-mysql-3.2.10/create.sql.gz |mysql -uzabbix -p zabbix
 数据库密码：
 访问host
 初始账号密码：admin/zabbix
