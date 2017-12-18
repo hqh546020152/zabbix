@@ -71,7 +71,7 @@ zabbix_nginx(){
 	[ $? -eq 0 ] && echo "nginx已安装完毕" && return 0
 	yum install -y nginx
 	#如yum上没nginx包则继续安装包添加，并重新下载安装
-	[ $? -ne 0 ] && rpm -Uvh http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm && yum install -y
+	[ $? -ne 0 ] && rpm -Uvh http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm && yum install -y nginx
 	
 	nginx -v &> /dev/null
 	[ $? -ne 0 ] && echo "nginx安装失败，请检查原因" && return 0
